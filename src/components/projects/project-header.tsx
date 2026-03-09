@@ -394,41 +394,59 @@ export function ProjectHeader({ project, allTags }: ProjectHeaderProps) {
             {githubUrl || "Set GitHub URL..."}
           </span>
         )}
-        {githubUrl.trim() && (
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-3">
+        <Button
+          onClick={handleLaunchTerminal}
+          disabled={!projectPath.trim() || launching}
+          className={
+            projectPath.trim()
+              ? "flex-1 gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
+              : "flex-1 gap-2 bg-muted text-muted-foreground cursor-not-allowed"
+          }
+          style={
+            projectPath.trim()
+              ? {
+                  boxShadow:
+                    "0 0 20px -2px var(--neon-accent, #22d3ee), 0 0 40px -5px color-mix(in srgb, var(--neon-accent, #22d3ee) 30%, transparent)",
+                }
+              : undefined
+          }
+        >
+          <Terminal className="size-4" />
+          {launching ? "Launching..." : "Launch Agent"}
+        </Button>
+
+        {githubUrl.trim() ? (
           <a
             href={githubUrl.trim()}
             target="_blank"
             rel="noopener noreferrer"
+            className="flex-1"
           >
-            <Button size="sm" variant="outline" className="shrink-0 gap-1.5">
-              <ExternalLink className="size-3.5" />
-              Open
-            </Button>
-          </a>
-        )}
-      </div>
-
-      {/* Launch Agent button */}
-      <Button
-        onClick={handleLaunchTerminal}
-        disabled={!projectPath.trim() || launching}
-        className={
-          projectPath.trim()
-            ? "w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
-            : "w-full gap-2 bg-muted text-muted-foreground cursor-not-allowed"
-        }
-        style={
-          projectPath.trim()
-            ? {
+            <Button
+              className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
+              style={{
                 boxShadow:
                   "0 0 20px -2px var(--neon-accent, #22d3ee), 0 0 40px -5px color-mix(in srgb, var(--neon-accent, #22d3ee) 30%, transparent)",
-              }
-            : undefined
-        }
-      >
-        <Terminal className="size-4" />
-        {launching ? "Launching..." : "Launch Agent"}
-      </Button>
+              }}
+            >
+              <Github className="size-4" />
+              Open on GitHub
+            </Button>
+          </a>
+        ) : (
+          <Button
+            disabled
+            className="flex-1 gap-2 bg-muted text-muted-foreground cursor-not-allowed"
+          >
+            <Github className="size-4" />
+            Open on GitHub
+          </Button>
+        )}
+      </div>
 
       {/* Delete confirmation dialog */}
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
