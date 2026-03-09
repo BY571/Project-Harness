@@ -132,83 +132,111 @@
   }
 }
 
-/* Neon accent styles */
-.dark {
-  /* Subtle neon glow on cards */
-  & [data-slot="card"] {
-    border-color: oklch(0.40 0.06 270 / 35%);
-    box-shadow: 0 0 15px -3px oklch(0.75 0.18 195 / 8%),
-                inset 0 1px 0 oklch(1 0 0 / 3%);
-  }
+/* ===== Neon Arcade Accents ===== */
 
-  & [data-slot="card"]:hover {
-    border-color: oklch(0.50 0.10 270 / 40%);
-    box-shadow: 0 0 20px -3px oklch(0.75 0.18 195 / 15%),
-                inset 0 1px 0 oklch(1 0 0 / 5%);
-  }
-
-  /* Neon glow on primary buttons */
-  & button[data-slot="button"]:not([data-variant]) {
-    box-shadow: 0 0 12px -2px oklch(0.75 0.18 195 / 40%);
-  }
-  & button[data-slot="button"]:not([data-variant]):hover {
-    box-shadow: 0 0 20px -2px oklch(0.75 0.18 195 / 60%);
-  }
-
-  /* Neon focus rings */
-  & *:focus-visible {
-    outline-color: oklch(0.75 0.18 195 / 70%);
-    box-shadow: 0 0 8px oklch(0.75 0.18 195 / 30%);
-  }
-
-  /* Neon sidebar border */
-  & aside {
-    border-color: oklch(0.40 0.06 270 / 30%);
-    box-shadow: 1px 0 20px -5px oklch(0.65 0.25 300 / 10%);
-  }
-
-  /* Neon glow on dialog overlay */
-  & [data-slot="dialog-content"] {
-    box-shadow: 0 0 40px -8px oklch(0.75 0.18 195 / 20%),
-                0 0 80px -15px oklch(0.65 0.25 300 / 12%);
-    border-color: oklch(0.40 0.06 270 / 40%);
-  }
-
-  /* Neon badge glow */
-  & [data-slot="badge"] {
-    box-shadow: 0 0 6px -1px oklch(0.75 0.18 195 / 20%);
-  }
-
-  /* Neon accent on active sidebar links */
-  & nav a.bg-accent {
-    box-shadow: inset 3px 0 0 oklch(0.75 0.18 195),
-                0 0 10px -4px oklch(0.75 0.18 195 / 25%);
-  }
-
-  /* Neon checkbox glow when checked */
-  & button[data-slot="checkbox"][data-state="checked"] {
-    box-shadow: 0 0 8px -1px oklch(0.75 0.18 195 / 50%);
-  }
-
-  /* Subtle scanline texture on background */
-  & body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      oklch(0 0 0 / 2%) 2px,
-      oklch(0 0 0 / 2%) 4px
-    );
-  }
+/* Neon text glow */
+.neon-text {
+  color: #22d3ee;
+  text-shadow: 0 0 7px #22d3ee99, 0 0 25px #22d3ee44, 0 0 50px #22d3ee22;
 }
 
-/* Neon text glow utility */
-.neon-text {
-  text-shadow: 0 0 7px oklch(0.75 0.18 195 / 60%),
-               0 0 20px oklch(0.75 0.18 195 / 30%);
+/* Neon glow on cards */
+.dark [data-slot="card"] {
+  box-shadow: 0 0 15px -3px #22d3ee15, 0 0 30px -5px #a855f710, inset 0 1px 0 #ffffff08;
+  border: 1px solid #22d3ee20;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.dark [data-slot="card"]:hover {
+  box-shadow: 0 0 20px -3px #22d3ee30, 0 0 40px -5px #a855f720, inset 0 1px 0 #ffffff10;
+  border-color: #22d3ee35;
+}
+
+/* Neon sidebar */
+.dark aside {
+  border-right: 1px solid #22d3ee18 !important;
+  box-shadow: 1px 0 25px -5px #a855f718;
+}
+
+/* Neon active sidebar link */
+.dark nav a.bg-accent {
+  box-shadow: inset 3px 0 0 #22d3ee, 0 0 12px -4px #22d3ee40;
+  background: #22d3ee10 !important;
+}
+
+/* Neon primary buttons */
+.dark button.bg-primary {
+  box-shadow: 0 0 15px -2px #22d3ee50, 0 0 30px -5px #22d3ee25;
+  transition: box-shadow 0.3s ease;
+}
+.dark button.bg-primary:hover {
+  box-shadow: 0 0 25px -2px #22d3ee70, 0 0 50px -5px #22d3ee35;
+}
+
+/* Neon glow on "New Project" button specifically */
+.dark aside button.w-full {
+  box-shadow: 0 0 12px -2px #22d3ee40;
+}
+.dark aside button.w-full:hover {
+  box-shadow: 0 0 22px -2px #22d3ee60;
+}
+
+/* Neon focus rings */
+.dark *:focus-visible {
+  outline-color: #22d3eebb !important;
+  box-shadow: 0 0 10px #22d3ee40, 0 0 20px #22d3ee15 !important;
+}
+
+/* Neon dialog glow */
+.dark [data-slot="dialog-overlay"] + div,
+.dark [role="dialog"] {
+  box-shadow: 0 0 50px -8px #22d3ee30, 0 0 100px -15px #a855f720 !important;
+  border: 1px solid #22d3ee25 !important;
+}
+
+/* Neon badges */
+.dark [data-slot="badge"] {
+  box-shadow: 0 0 8px -1px #22d3ee30;
+}
+
+/* Neon checkbox checked */
+.dark [data-state="checked"] {
+  box-shadow: 0 0 10px -1px #22d3ee55;
+}
+
+/* Neon workspace tab active indicator */
+.dark .neon-tab-active {
+  box-shadow: 0 0 8px -2px #22d3ee60;
+}
+
+/* Neon input focus */
+.dark input:focus,
+.dark textarea:focus {
+  border-color: #22d3ee50 !important;
+  box-shadow: 0 0 10px -3px #22d3ee30, 0 0 20px -5px #22d3ee15 !important;
+}
+
+/* Neon status dot pulse for in_progress */
+.dark .bg-blue-500 {
+  box-shadow: 0 0 6px 1px #3b82f680;
+}
+
+/* Neon drop target glow */
+.dark .ring-accent {
+  box-shadow: 0 0 15px -3px #22d3ee40 !important;
+}
+
+/* Scanline overlay */
+.dark body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.015) 3px,
+    rgba(0, 0, 0, 0.015) 6px
+  );
 }
