@@ -1,6 +1,6 @@
 "use client";
 
-import { STATUS_LABELS } from "@/types";
+import { STATUS_LABELS, STATUS_HEX_COLORS } from "@/types";
 import type { ProjectStatus } from "@/types";
 
 export interface TooltipData {
@@ -13,13 +13,6 @@ export interface TooltipData {
   x: number;
   y: number;
 }
-
-const STATUS_DOT_COLORS: Record<string, string> = {
-  not_started: "#6b7280",
-  in_progress: "#3b82f6",
-  on_hold: "#f59e0b",
-  done: "#22c55e",
-};
 
 interface GraphTooltipProps {
   data: TooltipData | null;
@@ -47,7 +40,7 @@ export function GraphTooltip({ data }: GraphTooltipProps) {
         <div className="flex items-center gap-1.5 mt-1.5">
           <span
             className="inline-block h-2 w-2 rounded-full"
-            style={{ backgroundColor: STATUS_DOT_COLORS[data.status] ?? "#6b7280" }}
+            style={{ backgroundColor: STATUS_HEX_COLORS[data.status as ProjectStatus] ?? "#6b7280" }}
           />
           <span className="text-xs text-gray-300">
             {STATUS_LABELS[data.status as ProjectStatus] ?? data.status}

@@ -75,7 +75,7 @@ export function CreateProjectDialog({ open, onOpenChange, tags, activeWorkspaceI
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => onOpenChange(isOpen)}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>New Project</DialogTitle>

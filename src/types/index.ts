@@ -36,3 +36,10 @@ export const PRIORITY_COLORS: Record<ProjectPriority, string> = {
   high: "bg-orange-500",
   urgent: "bg-red-500",
 };
+
+export const STATUS_HEX_COLORS: Record<ProjectStatus, string> = {
+  not_started: "#6b7280",
+  in_progress: "#3b82f6",
+  on_hold: "#f59e0b",
+  done: "#22c55e",
+};

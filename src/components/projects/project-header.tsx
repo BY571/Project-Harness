@@ -30,7 +30,7 @@ import {
   PRIORITY_COLORS,
 } from "@/types";
 import type { ProjectStatus, ProjectPriority } from "@/types";
-import { Trash2, ChevronDown, FolderOpen, Terminal, Github, ExternalLink } from "lucide-react";
+import { Trash2, ChevronDown, FolderOpen, Terminal, Github } from "lucide-react";
 import { launchTerminal } from "@/lib/actions/terminal";
 
 interface ProjectTag {
@@ -77,30 +77,13 @@ export function ProjectHeader({ project, allTags }: ProjectHeaderProps) {
   const pathInputRef = useRef<HTMLInputElement>(null);
   const githubInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-focus inputs when entering edit mode
   useEffect(() => {
-    if (editingName && nameInputRef.current) {
-      nameInputRef.current.focus();
-      nameInputRef.current.select();
-    }
+    if (editingName) { nameInputRef.current?.focus(); nameInputRef.current?.select(); }
   }, [editingName]);
-
-  useEffect(() => {
-    if (editingDescription && descriptionRef.current) {
-      descriptionRef.current.focus();
-    }
-  }, [editingDescription]);
-
-  useEffect(() => {
-    if (editingPath && pathInputRef.current) {
-      pathInputRef.current.focus();
-    }
-  }, [editingPath]);
-
-  useEffect(() => {
-    if (editingGithub && githubInputRef.current) {
-      githubInputRef.current.focus();
-    }
-  }, [editingGithub]);
+  useEffect(() => { if (editingDescription) descriptionRef.current?.focus(); }, [editingDescription]);
+  useEffect(() => { if (editingPath) pathInputRef.current?.focus(); }, [editingPath]);
+  useEffect(() => { if (editingGithub) githubInputRef.current?.focus(); }, [editingGithub]);
 
   const saveName = async () => {
     setEditingName(false);
@@ -397,6 +380,7 @@ export function ProjectHeader({ project, allTags }: ProjectHeaderProps) {
       </div>
 
       {/* Action buttons */}
+      {/* Action buttons */}
       <div className="flex gap-3">
         <Button
           onClick={handleLaunchTerminal}
@@ -406,42 +390,20 @@ export function ProjectHeader({ project, allTags }: ProjectHeaderProps) {
               ? "flex-1 gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
               : "flex-1 gap-2 bg-muted text-muted-foreground cursor-not-allowed"
           }
-          style={
-            projectPath.trim()
-              ? {
-                  boxShadow:
-                    "0 0 20px -2px var(--neon-accent, #22d3ee), 0 0 40px -5px color-mix(in srgb, var(--neon-accent, #22d3ee) 30%, transparent)",
-                }
-              : undefined
-          }
         >
           <Terminal className="size-4" />
           {launching ? "Launching..." : "Launch Agent"}
         </Button>
 
         {githubUrl.trim() ? (
-          <a
-            href={githubUrl.trim()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1"
-          >
-            <Button
-              className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
-              style={{
-                boxShadow:
-                  "0 0 20px -2px var(--neon-accent, #22d3ee), 0 0 40px -5px color-mix(in srgb, var(--neon-accent, #22d3ee) 30%, transparent)",
-              }}
-            >
+          <a href={githubUrl.trim()} target="_blank" rel="noopener noreferrer" className="flex-1">
+            <Button className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80">
               <Github className="size-4" />
               Open on GitHub
             </Button>
           </a>
         ) : (
-          <Button
-            disabled
-            className="flex-1 gap-2 bg-muted text-muted-foreground cursor-not-allowed"
-          >
+          <Button disabled className="flex-1 gap-2 bg-muted text-muted-foreground cursor-not-allowed">
             <Github className="size-4" />
             Open on GitHub
           </Button>

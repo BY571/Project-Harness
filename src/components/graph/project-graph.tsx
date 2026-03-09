@@ -31,7 +31,6 @@ interface ProjectGraphProps {
     notes: { id: string; type: string; resolved: boolean }[];
   }>;
   tags: { id: string; name: string; color: string }[];
-  activeTagId?: string | null;
 }
 
 interface GraphNode extends d3.SimulationNodeDatum {
@@ -44,7 +43,6 @@ interface GraphNode extends d3.SimulationNodeDatum {
   tasks: { id: string; completed: boolean }[];
   notes: { id: string; type: string; resolved: boolean }[];
   radius: number;
-  color: string;
 }
 
 interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
@@ -55,20 +53,6 @@ interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-const STATUS_COLORS: Record<string, string> = {
-  not_started: "#6b7280",
-  in_progress: "#3b82f6",
-  on_hold: "#f59e0b",
-  done: "#22c55e",
-};
-
-const STATUS_STROKE_COLORS: Record<string, string> = {
-  not_started: "#9ca3af",
-  in_progress: "#60a5fa",
-  on_hold: "#fbbf24",
-  done: "#4ade80",
-};
 
 const PRIORITY_RADIUS: Record<string, number> = {
   low: 8,
@@ -87,16 +71,13 @@ function linkDashArray(type: string): string | null {
 // Component
 // ---------------------------------------------------------------------------
 
-export function ProjectGraph({ projects: allProjects, tags, activeTagId: propActiveTagId }: ProjectGraphProps) {
+export function ProjectGraph({ projects: allProjects, tags }: ProjectGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const simulationRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const router = useRouter();
-  const { activeTagId: contextActiveTagId } = useActiveTag();
+  const { activeTagId } = useActiveTag();
   const { activeWorkspaceId } = useActiveWorkspace();
-
-  const activeTagId = propActiveTagId !== undefined ? propActiveTagId : contextActiveTagId;
 
   // Graph style settings
   const DEFAULTS = { nodeColor: "#22d3ee", fillOpacity: 1, strokeOpacity: 0.8 };
@@ -191,7 +172,6 @@ export function ProjectGraph({ projects: allProjects, tags, activeTagId: propAct
       tasks: p.tasks,
       notes: p.notes,
       radius: PRIORITY_RADIUS[p.priority] ?? 25,
-      color: STATUS_COLORS[p.status] ?? "#6b7280",
     }));
 
     const nodeIds = new Set(nodes.map((n) => n.id));
@@ -211,7 +191,7 @@ export function ProjectGraph({ projects: allProjects, tags, activeTagId: propAct
     // Cluster centers based on tags
     // -----------------------------------------------------------------------
 
-    const uniqueTags = tags.length > 0 ? tags : [];
+    const uniqueTags = tags;
     const tagClusterCenters: Record<string, { x: number; y: number }> = {};
     const clusterRadius = Math.min(width, height) * 0.32;
 
@@ -512,10 +492,11 @@ export function ProjectGraph({ projects: allProjects, tags, activeTagId: propAct
       .append("circle")
       .attr("class", "node-circle")
       .attr("r", (d) => d.radius)
-      .attr("fill", "#22d3ee")
-      .attr("stroke", "#22d3ee")
+      .attr("fill", nodeColor)
+      .attr("fill-opacity", fillOpacity)
+      .attr("stroke", nodeColor)
       .attr("stroke-width", 1.5)
-      .attr("stroke-opacity", 0.8)
+      .attr("stroke-opacity", strokeOpacity)
       .attr("filter", "url(#neon-node)");
 
     // Task progress ring
@@ -532,7 +513,7 @@ export function ProjectGraph({ projects: allProjects, tags, activeTagId: propAct
         .append("circle")
         .attr("r", r)
         .attr("fill", "none")
-        .attr("stroke", "#22d3ee")
+        .attr("stroke", nodeColor)
         .attr("stroke-width", 1.5)
         .attr("stroke-opacity", 0.5)
         .attr("stroke-dasharray", `${circumference * ratio} ${circumference * (1 - ratio)}`)
@@ -588,8 +569,6 @@ export function ProjectGraph({ projects: allProjects, tags, activeTagId: propAct
       .velocityDecay(0.35)
       .on("tick", ticked);
 
-    simulationRef.current = simulation;
-
     // Build a lookup for quick node access by id
     const nodeById = new Map(nodes.map((n) => [n.id, n]));
 
@@ -601,35 +580,23 @@ export function ProjectGraph({ projects: allProjects, tags, activeTagId: propAct
         .attr("x2", (d) => nodeById.get(d.target)?.x ?? 0)
         .attr("y2", (d) => nodeById.get(d.target)?.y ?? 0);
 
-      // Update relation links
+      // Update relation links (shortened to stop at node edge)
+      function shortenedEnd(source: GraphNode, target: GraphNode) {
+        const dx = (target.x ?? 0) - (source.x ?? 0);
+        const dy = (target.y ?? 0) - (source.y ?? 0);
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist === 0) return { x: target.x ?? 0, y: target.y ?? 0 };
+        return {
+          x: (target.x ?? 0) - (dx / dist) * target.radius,
+          y: (target.y ?? 0) - (dy / dist) * target.radius,
+        };
+      }
+
       linkElements
-        .attr("x1", (d) => {
-          const source = d.source as GraphNode;
-          return source.x ?? 0;
-        })
-        .attr("y1", (d) => {
-          const source = d.source as GraphNode;
-          return source.y ?? 0;
-        })
-        .attr("x2", (d) => {
-          const target = d.target as GraphNode;
-          const source = d.source as GraphNode;
-          // Shorten line to stop at node edge
-          const dx = (target.x ?? 0) - (source.x ?? 0);
-          const dy = (target.y ?? 0) - (source.y ?? 0);
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist === 0) return target.x ?? 0;
-          return (target.x ?? 0) - (dx / dist) * target.radius;
-        })
-        .attr("y2", (d) => {
-          const target = d.target as GraphNode;
-          const source = d.source as GraphNode;
-          const dx = (target.x ?? 0) - (source.x ?? 0);
-          const dy = (target.y ?? 0) - (source.y ?? 0);
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist === 0) return target.y ?? 0;
-          return (target.y ?? 0) - (dy / dist) * target.radius;
-        });
+        .attr("x1", (d) => (d.source as GraphNode).x ?? 0)
+        .attr("y1", (d) => (d.source as GraphNode).y ?? 0)
+        .attr("x2", (d) => shortenedEnd(d.source as GraphNode, d.target as GraphNode).x)
+        .attr("y2", (d) => shortenedEnd(d.source as GraphNode, d.target as GraphNode).y);
 
       nodeElements.attr("transform", (d) => `translate(${d.x ?? 0},${d.y ?? 0})`);
     }
@@ -718,7 +685,6 @@ export function ProjectGraph({ projects: allProjects, tags, activeTagId: propAct
 
     return () => {
       simulation.stop();
-      simulationRef.current = null;
       resizeObserver.disconnect();
     };
   }, [projects, tags, navigateToProject, activeWorkspaceId]); // eslint-disable-line react-hooks/exhaustive-deps

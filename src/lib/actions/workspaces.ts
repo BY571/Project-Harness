@@ -16,12 +16,6 @@ export async function createWorkspace(name: string, color: string = "#6366f1") {
   return workspace;
 }
 
-export async function updateWorkspace(id: string, data: { name?: string; color?: string }) {
-  const workspace = await db.workspace.update({ where: { id }, data });
-  revalidatePath("/");
-  return workspace;
-}
-
 export async function deleteWorkspace(id: string) {
   // Set all projects in this workspace to have no workspace
   await db.project.updateMany({ where: { workspaceId: id }, data: { workspaceId: null } });

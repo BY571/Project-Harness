@@ -89,20 +89,6 @@ export async function updateProject(
   return project;
 }
 
-export async function getProjectsByWorkspace(workspaceId: string) {
-  return db.project.findMany({
-    where: { workspaceId },
-    include: {
-      tags: { include: { tag: true } },
-      tasks: true,
-      notes: true,
-      outgoingRelations: { include: { target: true } },
-      incomingRelations: { include: { source: true } },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
-}
-
 export async function deleteProject(id: string) {
   await db.project.delete({ where: { id } });
   revalidatePath("/");

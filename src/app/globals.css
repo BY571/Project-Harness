@@ -217,11 +217,6 @@
   box-shadow: 0 0 10px -1px color-mix(in srgb, var(--neon-accent) 35%, transparent);
 }
 
-/* Neon workspace tab active indicator */
-.dark .neon-tab-active {
-  box-shadow: 0 0 8px -2px color-mix(in srgb, var(--neon-accent) 40%, transparent);
-}
-
 /* Neon input focus */
 .dark input:focus,
 .dark textarea:focus {

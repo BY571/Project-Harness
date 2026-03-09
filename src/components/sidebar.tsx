@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Plus, FolderOpen, X } from "lucide-react";
@@ -64,7 +64,7 @@ export function Sidebar({
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
   const [creatingWorkspace, setCreatingWorkspace] = useState(false);
   const newWorkspaceInputRef = useRef<HTMLInputElement>(null);
-  const tabBarRef = useRef<HTMLDivElement>(null);
+
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const [dropTargetStatus, setDropTargetStatus] = useState<ProjectStatus | null>(null);
 
@@ -108,35 +108,34 @@ export function Sidebar({
     await deleteWorkspace(workspaceId);
   };
 
-  const handleDragStart = useCallback((e: React.DragEvent, projectId: string) => {
+  const handleDragStart = (e: React.DragEvent, projectId: string) => {
     setDraggedProjectId(projectId);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", projectId);
-    // Make the drag ghost slightly transparent
     if (e.currentTarget instanceof HTMLElement) {
       e.currentTarget.style.opacity = "0.5";
     }
-  }, []);
+  };
 
-  const handleDragEnd = useCallback((e: React.DragEvent) => {
+  const handleDragEnd = (e: React.DragEvent) => {
     setDraggedProjectId(null);
     setDropTargetStatus(null);
     if (e.currentTarget instanceof HTMLElement) {
       e.currentTarget.style.opacity = "1";
     }
-  }, []);
+  };
 
-  const handleDragOver = useCallback((e: React.DragEvent, status: ProjectStatus) => {
+  const handleDragOver = (e: React.DragEvent, status: ProjectStatus) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
     setDropTargetStatus(status);
-  }, []);
+  };
 
-  const handleDragLeave = useCallback(() => {
+  const handleDragLeave = () => {
     setDropTargetStatus(null);
-  }, []);
+  };
 
-  const handleDrop = useCallback(async (e: React.DragEvent, targetStatus: ProjectStatus) => {
+  const handleDrop = async (e: React.DragEvent, targetStatus: ProjectStatus) => {
     e.preventDefault();
     const projectId = e.dataTransfer.getData("text/plain");
     setDraggedProjectId(null);
@@ -147,7 +146,7 @@ export function Sidebar({
     if (!project || project.status === targetStatus) return;
 
     await updateProject(projectId, { status: targetStatus });
-  }, [filteredProjects]);
+  };
 
   return (
     <aside className="w-64 border-r bg-muted/30 flex flex-col h-full">
@@ -157,10 +156,7 @@ export function Sidebar({
 
       {/* Workspace tab bar */}
       <div className="border-b">
-        <div
-          ref={tabBarRef}
-          className="flex items-center gap-0.5 px-2 pt-2 overflow-x-auto scrollbar-none"
-        >
+        <div className="flex items-center gap-0.5 px-2 pt-2 overflow-x-auto scrollbar-none">
           {/* "All" tab */}
           <button
             onClick={() => onWorkspaceChange?.(null)}
