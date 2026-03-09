@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  status      String   @default("not_started") // not_started | in_progress | on_hold | done
+  priority    String   @default("medium")       // low | medium | high | urgent
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks    Task[]
+  notes    Note[]
+  tags     ProjectTag[]
+
+  outgoingRelations ProjectRelation[] @relation("source")
+  incomingRelations ProjectRelation[] @relation("target")
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  description String   @default("")
+  completed   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  projectId String
+  content   String
+  type      String   @default("note") // note | blocker
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  name     String       @unique
+  color    String       @default("#6366f1")
+  projects ProjectTag[]
+}
+
+model ProjectTag {
+  projectId String
+  tagId     String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, tagId])
+}
+
+model ProjectRelation {
+  id              String  @id @default(cuid())
+  sourceProjectId String
+  targetProjectId String
+  type            String  // follow_up | based_on | related_to
+  label           String  @default("")
+
+  source Project @relation("source", fields: [sourceProjectId], references: [id], onDelete: Cascade)
+  target Project @relation("target", fields: [targetProjectId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceProjectId, targetProjectId])
+}
