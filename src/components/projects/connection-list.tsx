@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { createRelation, deleteRelation } from "@/lib/actions/relations";
 import { RELATION_LABELS } from "@/types";
 import type { RelationType } from "@/types";
@@ -19,6 +20,7 @@ import {
   ArrowLeft,
   Plus,
   Link2,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -170,36 +172,41 @@ export function ConnectionList({
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">
                   Project
                 </label>
-                <select
-                  value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value)}
-                  className="flex h-8 w-full rounded-md border border-input bg-transparent px-2.5 py-1 text-sm shadow-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                  <option value="">Select project...</option>
-                  {otherProjects.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className="flex h-8 w-full items-center justify-between rounded-md border border-input bg-transparent px-2.5 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                      <span className="truncate">{selectedProjectId ? otherProjects.find(p => p.id === selectedProjectId)?.name : "Select project..."}</span>
+                      <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-[200px] max-h-[200px] overflow-y-auto">
+                    {otherProjects.map((p) => (
+                      <DropdownMenuItem key={p.id} onClick={() => setSelectedProjectId(p.id)}>
+                        {p.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">
                   Relation
                 </label>
-                <select
-                  value={selectedType}
-                  onChange={(e) =>
-                    setSelectedType(e.target.value as RelationType)
-                  }
-                  className="flex h-8 w-full rounded-md border border-input bg-transparent px-2.5 py-1 text-sm shadow-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                  {RELATION_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {RELATION_LABELS[type]}
-                    </option>
-                  ))}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className="flex h-8 w-full items-center justify-between rounded-md border border-input bg-transparent px-2.5 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                      <span>{RELATION_LABELS[selectedType]}</span>
+                      <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-[180px]">
+                    {RELATION_TYPES.map((type) => (
+                      <DropdownMenuItem key={type} onClick={() => setSelectedType(type)}>
+                        {RELATION_LABELS[type]}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             <div className="flex justify-end gap-2">

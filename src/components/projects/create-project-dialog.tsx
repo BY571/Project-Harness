@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import { createProject } from "@/lib/actions/projects";
 import { createTag } from "@/lib/actions/tags";
 import type { ProjectStatus, ProjectPriority } from "@/types";
-import { STATUS_LABELS, PRIORITY_LABELS } from "@/types";
+import { STATUS_LABELS, PRIORITY_LABELS, STATUS_COLORS, PRIORITY_COLORS } from "@/types";
+import { cn } from "@/lib/utils";
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -91,27 +94,53 @@ export function CreateProjectDialog({ open, onOpenChange, tags, activeWorkspaceI
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Status</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
-              >
-                {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={cn(
+                    "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent",
+                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  )}
+                >
+                    <span className="flex items-center gap-2">
+                      <span className={cn("h-2 w-2 rounded-full", STATUS_COLORS[status])} />
+                      {STATUS_LABELS[status]}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-[180px]">
+                  {(Object.entries(STATUS_LABELS) as [ProjectStatus, string][]).map(([value, label]) => (
+                    <DropdownMenuItem key={value} onClick={() => setStatus(value)}>
+                      <span className={cn("h-2 w-2 rounded-full mr-2", STATUS_COLORS[value])} />
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <div>
               <label className="text-sm font-medium">Priority</label>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as ProjectPriority)}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
-              >
-                {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={cn(
+                    "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent",
+                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  )}
+                >
+                    <span className="flex items-center gap-2">
+                      <span className={cn("h-2 w-2 rounded-full", PRIORITY_COLORS[priority])} />
+                      {PRIORITY_LABELS[priority]}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-[180px]">
+                  {(Object.entries(PRIORITY_LABELS) as [ProjectPriority, string][]).map(([value, label]) => (
+                    <DropdownMenuItem key={value} onClick={() => setPriority(value)}>
+                      <span className={cn("h-2 w-2 rounded-full mr-2", PRIORITY_COLORS[value])} />
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
