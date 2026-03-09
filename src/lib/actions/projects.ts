@@ -35,6 +35,7 @@ export async function createProject(data: {
   status?: string;
   priority?: string;
   tagIds?: string[];
+  workspaceId?: string | null;
 }) {
   const project = await db.project.create({
     data: {
@@ -42,6 +43,7 @@ export async function createProject(data: {
       description: data.description ?? "",
       status: data.status ?? "not_started",
       priority: data.priority ?? "medium",
+      workspaceId: data.workspaceId ?? null,
       tags: data.tagIds
         ? { create: data.tagIds.map((tagId) => ({ tagId })) }
         : undefined,
@@ -59,6 +61,7 @@ export async function updateProject(
     status?: string;
     priority?: string;
     tagIds?: string[];
+    workspaceId?: string | null;
   }
 ) {
   const { tagIds, ...projectData } = data;
@@ -78,6 +81,20 @@ export async function updateProject(
   revalidatePath("/");
   revalidatePath(`/projects/${id}`);
   return project;
+}
+
+export async function getProjectsByWorkspace(workspaceId: string) {
+  return db.project.findMany({
+    where: { workspaceId },
+    include: {
+      tags: { include: { tag: true } },
+      tasks: true,
+      notes: true,
+      outgoingRelations: { include: { target: true } },
+      incomingRelations: { include: { source: true } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
 }
 
 export async function deleteProject(id: string) {

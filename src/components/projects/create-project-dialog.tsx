@@ -16,9 +16,10 @@ interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tags: { id: string; name: string; color: string }[];
+  activeWorkspaceId?: string | null;
 }
 
-export function CreateProjectDialog({ open, onOpenChange, tags }: CreateProjectDialogProps) {
+export function CreateProjectDialog({ open, onOpenChange, tags, activeWorkspaceId }: CreateProjectDialogProps) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -38,6 +39,7 @@ export function CreateProjectDialog({ open, onOpenChange, tags }: CreateProjectD
       status,
       priority,
       tagIds: selectedTagIds,
+      workspaceId: activeWorkspaceId ?? null,
     });
     setLoading(false);
     resetForm();

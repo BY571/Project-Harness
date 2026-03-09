@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import * as d3 from "d3";
 import { GraphTooltip, type TooltipData } from "./graph-tooltip";
 import { useActiveTag } from "./active-tag-context";
+import { useActiveWorkspace } from "@/components/workspace-context";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -17,6 +18,7 @@ interface ProjectGraphProps {
     description: string;
     status: string;
     priority: string;
+    workspaceId?: string | null;
     tags: { tag: { id: string; name: string; color: string } }[];
     outgoingRelations: {
       id: string;
@@ -83,15 +85,21 @@ function linkDashArray(type: string): string | null {
 // Component
 // ---------------------------------------------------------------------------
 
-export function ProjectGraph({ projects, tags, activeTagId: propActiveTagId }: ProjectGraphProps) {
+export function ProjectGraph({ projects: allProjects, tags, activeTagId: propActiveTagId }: ProjectGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const simulationRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const router = useRouter();
   const { activeTagId: contextActiveTagId } = useActiveTag();
+  const { activeWorkspaceId } = useActiveWorkspace();
 
   const activeTagId = propActiveTagId !== undefined ? propActiveTagId : contextActiveTagId;
+
+  // Filter projects by active workspace
+  const projects = activeWorkspaceId
+    ? allProjects.filter((p) => p.workspaceId === activeWorkspaceId)
+    : allProjects;
 
   // Stable callback for navigation
   const navigateToProject = useCallback(
@@ -535,7 +543,7 @@ export function ProjectGraph({ projects, tags, activeTagId: propActiveTagId }: P
       simulationRef.current = null;
       resizeObserver.disconnect();
     };
-  }, [projects, tags, navigateToProject]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [projects, tags, navigateToProject, activeWorkspaceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // -------------------------------------------------------------------------
   // Tag filtering effect

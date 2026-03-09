@@ -10,6 +10,16 @@ datasource db {
   provider = "sqlite"
 }
 
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  color     String   @default("#6366f1")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  projects Project[]
+}
+
 model Project {
   id          String   @id @default(cuid())
   name        String
@@ -18,6 +28,9 @@ model Project {
   priority    String   @default("medium")       // low | medium | high | urgent
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
 
   tasks    Task[]
   notes    Note[]
