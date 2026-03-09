@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Manager
+
+A web application for organizing and tracking multiple projects. Features an interactive graph visualization showing how projects relate to each other, with detailed per-project views for tasks, notes, and blockers.
+
+## Features
+
+- **Interactive graph dashboard** -- Force-directed graph showing all projects as nodes, with edges representing relationships (follow-up, based-on, related-to). Nodes are colored by status and sized by priority. Tag-based clustering groups related projects visually.
+- **Workspaces** -- Organize projects into separate groups (e.g. "Work", "Side Jobs") using a tab bar. Each workspace filters the sidebar and graph to show only its projects.
+- **Project detail view** -- Per-project page with inline-editable name and description, status/priority dropdowns, and tag management.
+- **Tasks** -- Checklist of actionable items per project. Add, complete, and delete tasks with optimistic UI updates.
+- **Notes and blockers** -- Freeform notes and blocker entries per project. Blockers are visually distinct (red indicator) and can be marked as resolved.
+- **Project connections** -- Link projects together with typed relationships: "follow-up to", "based on", or "related to". Connections appear as edges in the graph.
+- **Tags** -- Color-coded tags for categorizing projects. Tags drive the clustering in the graph visualization and can be used to filter the view.
+- **Responsive design** -- Sidebar collapses to a slide-over drawer on mobile.
+
+## Tech Stack
+
+- **Next.js** (App Router, TypeScript)
+- **Prisma** ORM with SQLite
+- **Tailwind CSS** with shadcn/ui components
+- **D3.js** for the force-directed graph visualization
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Installation
+
+```bash
+git clone https://github.com/BY571/project-manager.git
+cd project-manager
+npm install
+```
+
+### Database Setup
+
+Generate the Prisma client and run migrations to create the SQLite database:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+### Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Create a workspace** -- Click the "+" button in the workspace tab bar (top of the sidebar) to create a workspace like "Work" or "Side Jobs".
+2. **Create a project** -- Click "New Project" in the sidebar. Fill in a name, description, status, priority, and tags. The project is automatically assigned to the active workspace.
+3. **Add tasks** -- On the project detail page, type a task title and press Enter. Check off tasks as you complete them.
+4. **Add notes and blockers** -- Toggle between "Note" and "Blocker" types, then add entries. Resolve blockers when they are no longer blocking.
+5. **Connect projects** -- In the Connections section, link to other projects with a relationship type (follow-up, based-on, related-to).
+6. **View the graph** -- Click "Dashboard" in the sidebar to see all projects visualized. Hover for details, click to navigate. Use the tag filter in the sidebar to highlight specific groups.
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/
+    (main)/              # Route group with sidebar layout
+      page.tsx           # Dashboard with graph
+      projects/[id]/     # Project detail page
+  components/
+    graph/               # D3 graph visualization
+    projects/            # Project-related UI components
+    ui/                  # shadcn/ui primitives
+  lib/
+    actions/             # Server actions (projects, tasks, notes, tags, relations, workspaces)
+    db.ts                # Prisma client singleton
+  types/                 # Shared TypeScript types
+prisma/
+  schema.prisma          # Database schema
+```
